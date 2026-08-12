@@ -46,8 +46,18 @@ _SUSPICIOUS_EXTENSIONS = (
 
 def _ensure_scheme(url: str) -> str:
     """urlparse needs a scheme to correctly split netloc from path."""
+    """
+    urlparse needs a scheme to correctly split netloc from path.
+ 
+    When the user doesn't type a scheme (e.g. "google.com" instead of
+    "https://google.com"), we have to guess one. We default to HTTPS
+    rather than HTTP, since the large majority of real-world domains
+    serve HTTPS by default in 2026 and browsers auto-upgrade bare
+    domains to HTTPS. Defaulting to HTTP would manufacture a false
+    "insecure" signal for ordinary, legitimate bare-domain input.
+    """
     if "://" not in url:
-        return "http://" + url
+        return "https://" + url
     return url
 
 
